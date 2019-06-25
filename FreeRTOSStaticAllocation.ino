@@ -1,4 +1,4 @@
-#include <MapleFreeRTOS.h>
+#include <MapleFreeRTOS821.h>
 
 void vLEDThread(void *)
 {
@@ -13,24 +13,21 @@ void vLEDThread(void *)
   }
 }
 
+TimerHandle_t xTimer;
 xSemaphoreHandle xSemaphore;
 xSemaphoreHandle xMutex;
 xQueueHandle xQueue;
 
-void vTask1(void *)
+void vTimerCallback(TimerHandle_t pxTimer)
 {
-  while(1)
-  {
-    vTaskDelay(1000);
-    xSemaphoreGive(xSemaphore);
-
-    xSemaphoreTake(xMutex, portMAX_DELAY);
-    Serial.println("Test");
-    xSemaphoreGive(xMutex);
-  }
+  xSemaphoreGive(xSemaphore);
+  
+  xSemaphoreTake(xMutex, portMAX_DELAY);
+  Serial.println("Test");
+  xSemaphoreGive(xMutex);
 }
 
-void vTask2(void *)
+void vTask1(void *)
 {
   while(1)
   {
@@ -40,7 +37,7 @@ void vTask2(void *)
   }
 }
 
-void vTask3(void *)
+void vTask2(void *)
 {
   while(1)
   {
@@ -56,19 +53,23 @@ void vTask3(void *)
 
 void setup()
 {
-  Serial.begin(9600);
-
   pinMode(PC6, OUTPUT);
   digitalWrite(PC6, 0);
+
+  Serial.begin(9600);
+
+  delay(1000);
 
   vSemaphoreCreateBinary(xSemaphore);
   xQueue = xQueueCreate(1000, sizeof(int));
   xMutex = xSemaphoreCreateMutex();
 
-  xTaskCreate(vLEDThread, (const signed char*)"LED Thread", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY, NULL);
-  xTaskCreate(vTask1, (const signed char*)"Task 1", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY, NULL);
-  xTaskCreate(vTask2, (const signed char*)"Task 2", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY, NULL);
-  xTaskCreate(vTask3, (const signed char*)"Task 3", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY, NULL);
+  xTimer = xTimerCreate("Timer", 1000, pdTRUE, NULL, vTimerCallback);
+  xTimerStart(xTimer, 0);
+  
+  xTaskCreate(vLEDThread, "LED Thread", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY, NULL);
+  xTaskCreate(vTask1, "Task 1", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY, NULL);
+  xTaskCreate(vTask2, "Task 2", configMINIMAL_STACK_SIZE, NULL, tskIDLE_PRIORITY, NULL);
   vTaskStartScheduler();
 }
 
