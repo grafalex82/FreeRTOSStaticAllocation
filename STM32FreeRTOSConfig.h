@@ -84,13 +84,15 @@
 #define configTOTAL_HEAP_SIZE             ((size_t)(15 * 1024))
 
 #else
-#define configSUPPORT_DYNAMIC_ALLOCATION  0
+#define configMEMMANG_HEAP_NB             3
+#define configSUPPORT_DYNAMIC_ALLOCATION  1
+
 #define configSUPPORT_STATIC_ALLOCATION   1
-#define configMINIMAL_STACK_SIZE          ((uint16_t)128)
-#define configTOTAL_HEAP_SIZE             ((size_t)(8 * 1024))
+
+#define configMINIMAL_STACK_SIZE	  128
+#define configTOTAL_HEAP_SIZE             ((size_t)(13 * 1024))
 
 #define configMAX_PRIORITIES              (7)
-
 
 #endif /* configUSE_CMSIS_RTOS_V2 */
 
