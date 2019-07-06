@@ -130,13 +130,13 @@ public:
 
 void vLEDThread(void *)
 {
-  pinMode(PB14, OUTPUT_OPEN_DRAIN);
+  pinMode(PC13, OUTPUT);
   
   while(1)
   {
-    digitalWrite(PB14, true);
+    digitalWrite(PC13, true);
     vTaskDelay(1000);
-    digitalWrite(PB14, false);
+    digitalWrite(PC13, false);
     vTaskDelay(100);
   }
 }
@@ -183,9 +183,6 @@ void vTask2(void *)
 
 void setup()
 {
-  pinMode(PC6, OUTPUT);
-  digitalWrite(PC6, 0);
-
   Serial.begin(9600);
 
   xTimer.start();
@@ -214,4 +211,3 @@ extern "C" void vApplicationGetTimerTaskMemory (StaticTask_t **ppxTimerTaskTCBBu
   *ppxTimerTaskStackBuffer = Timer_Stack;
   *pulTimerTaskStackSize   = configTIMER_TASK_STACK_DEPTH;
 }
-
